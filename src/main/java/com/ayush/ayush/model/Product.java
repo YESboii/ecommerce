@@ -33,7 +33,7 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private Set<ProductOrder> productOrders;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="product_category_mapping",
     joinColumns = @JoinColumn(name = "product_id"),
     inverseJoinColumns = @JoinColumn(name = "category_id"))
