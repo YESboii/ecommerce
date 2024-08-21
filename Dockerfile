@@ -1,6 +1,10 @@
 FROM eclipse-temurin:21.0.2_13-jdk-jammy as build_stage
 WORKDIR /app
-COPY . .
+
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline
+COPY ./src ./src
 RUN ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:21.0.2_13-jre-jammy
