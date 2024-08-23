@@ -13,7 +13,9 @@ services:
       - ecommerce_mysql_volume:/var/lib/mysql
 
   springboot_backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     container_name: springboot_backend_container
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
@@ -25,6 +27,9 @@ services:
       - "8080:8080"
     networks:
       - application-network
+    volumes:
+      - "C:\\Users\\Ayush Gupta\\OneDrive\\Desktop\\Project\\ayush:/app"
+      - "C:/Users/Ayush Gupta/.m2:/root/.m2"
 
 networks:
   application-network:

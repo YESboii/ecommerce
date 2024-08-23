@@ -1,9 +1,11 @@
 package com.ayush.ayush.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -16,6 +18,7 @@ public class ProductCategory {
 
     private String name;
 
+    @JsonBackReference
     @ManyToMany(mappedBy = "categories")
-    private Set<Product> products;
+    private List<Product> products;
 }

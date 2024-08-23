@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,7 +25,7 @@ public class Order {
     private OrderStatus orderStatus;
 
     @OneToMany(mappedBy = "order",fetch = FetchType.EAGER)
-    private Set<ProductOrder> productOrders;
+    private List<ProductOrder> productOrders;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)

@@ -3,6 +3,7 @@ package com.ayush.ayush.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -13,5 +14,5 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 public class Customer extends AppUser{
     @OneToMany(mappedBy = "customer",fetch = FetchType.LAZY)
-    private Set<Order> orders;
+    private List<Order> orders;
 }
