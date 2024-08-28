@@ -19,7 +19,7 @@ public class Seller extends AppUser{
     private String gstId;
 
     @JsonManagedReference
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "seller_category_mapping",
     joinColumns = @JoinColumn(name = "seller_id"), inverseJoinColumns = @JoinColumn(name = "category_id")
     )

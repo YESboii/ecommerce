@@ -17,7 +17,7 @@ public class AppUser implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -29,7 +29,7 @@ public class AppUser implements Serializable {
     private String password;
 
 
-    private boolean twoFactorEnabled;
+    private Boolean twoFactorEnabled;
     @Column(nullable = false, unique = true)
     private String phoneNumber;
     @Embedded

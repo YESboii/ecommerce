@@ -11,11 +11,11 @@ public class ProductOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
-    private int quantity;
+    private Integer quantity;
 
-    private double pricePerQuantity;
+    private Double pricePerQuantity;
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;

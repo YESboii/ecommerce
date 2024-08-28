@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class SellerRepository {
+public class SellerRepositoryCustom {
 
     @PersistenceContext
     private EntityManager entityManager;

@@ -18,7 +18,7 @@ import java.util.Objects;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @Column(nullable = false)
     private String name;
@@ -26,14 +26,15 @@ public class Product {
     private String description;
 
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @Column(nullable = false)
-    private double amount;
+    private Double amount;
     @Lob
     private byte[] image;
-    @ManyToOne
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
+    @JsonIgnore
     @JsonManagedReference
     private Seller seller;
 
@@ -52,7 +53,7 @@ public class Product {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return id == product.id;
+        return id == product.id.intValue();
     }
 
     @Override
