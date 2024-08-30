@@ -30,5 +30,9 @@ public interface ProductRepository extends JpaRepository<Product,Integer> {
     @Transactional(readOnly = false)
     @Query("DELETE from Product p where p.id=:id and p.seller.id = :sellerId")
     void deleteProductByIdAndSeller(int id, int sellerId);
+
+    @Transactional(readOnly = true)
+    @Query("SELECT p.image from Product p where p.id=:id and p.seller.id=:sellerId")
+    String findImageBySellerIdAndId(int id,int sellerId);
 }
 

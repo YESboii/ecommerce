@@ -8,7 +8,8 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class ProductDto {
+public class ProductRequest {
+
     @NotBlank(message = "Required. Cannot be blank")
     private String name;
 
@@ -23,7 +24,6 @@ public class ProductDto {
     @NotNull(message = "Required field!")
     private Double amount;
 
-    private byte[] image;
 
     @Size(min = 1, message = "must at least belong to one category")
     @NotNull(message = "Required field!")

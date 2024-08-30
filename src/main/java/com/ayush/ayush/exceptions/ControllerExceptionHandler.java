@@ -49,15 +49,19 @@ public class ControllerExceptionHandler {
                 .build();
         return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<GeneralErrorResponse> handleServerErrorException(HttpServletRequest request){
-        GeneralErrorResponse response = GeneralErrorResponse.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message("Internal Server Error: Unexpected")
-                .path(request.getRequestURI())
-                .timestamp(LocalDateTime.now())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .build();
-        return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<GeneralErrorResponse> handleServerErrorException(HttpServletRequest request){
+//        GeneralErrorResponse response = GeneralErrorResponse.builder()
+//                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                .message("Internal Server Error: Unexpected")
+//                .path(request.getRequestURI())
+//                .timestamp(LocalDateTime.now())
+//                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+//                .build();
+//        return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
+    @ExceptionHandler(StorageException.class)
+    public ResponseEntity<String> handlee(Exception e ){
+        return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

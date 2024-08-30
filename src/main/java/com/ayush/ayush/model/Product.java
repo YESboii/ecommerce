@@ -30,8 +30,8 @@ public class Product {
 
     @Column(nullable = false)
     private Double amount;
-    @Lob
-    private byte[] image;
+
+    private String image;
     @ManyToOne(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     @JsonIgnore

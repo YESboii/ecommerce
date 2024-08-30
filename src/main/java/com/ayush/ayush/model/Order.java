@@ -24,7 +24,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @OneToMany(mappedBy = "order",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order",fetch = FetchType.LAZY)
     private List<ProductOrder> productOrders;
 
     @ManyToOne(fetch = FetchType.LAZY)

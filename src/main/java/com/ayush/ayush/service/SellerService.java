@@ -1,7 +1,10 @@
 package com.ayush.ayush.service;
 
 import com.ayush.ayush.controller.response.ProductListResponse;
-import com.ayush.ayush.dto.ProductDto;
+import com.ayush.ayush.dto.ImageDto;
+import com.ayush.ayush.dto.ProductRequest;
+import com.ayush.ayush.dto.ProductResponse;
+import com.ayush.ayush.exceptions.StorageException;
 import com.ayush.ayush.mapper.ProductMapper;
 import com.ayush.ayush.model.Product;
 import com.ayush.ayush.model.Seller;
@@ -13,10 +16,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,10 +34,18 @@ public class SellerService {
 
     private final ProductRepository productRepository;
     private final SellerRepositoryJpa sellerRepository;
+    private final FileService fileService;
 
 
-    public Optional<Product> getProduct(int id,int sellerId){
-        return productRepository.findProductByIdAndSeller(id,sellerId);
+    public Optional<ProductResponse> getProduct(int id, int sellerId){
+         Optional<Product> product = productRepository.findProductByIdAndSeller(id,sellerId);
+         if (product.isEmpty()){
+             Optional.empty();
+         }
+         Product toBeMapped = product.get();
+         byte[] img =  fileService.loadFileAsBytes(product.get().getImage());
+         ProductResponse response = ProductMapper.toDto(toBeMapped,img);
+         return Optional.of(response);
     }
 
 
@@ -49,12 +65,20 @@ public class SellerService {
         //Two Methods were implemented because we wanted to fetch the mapping as well as paginate the data.
        Page<Long> ids = productRepository.findProductIdsBySellerPagination(sellerId, pageable);
        List<Product> products = productRepository.findProductsBySeller(ids.toList());
-       return new ProductListResponse(products,ids.getNumber(),ids.getTotalPages());
+       List<ProductResponse> productResponses = new ArrayList<>();
+       products.forEach(
+               product -> {
+                   byte[] img =  fileService.loadFileAsBytes(product.getImage());
+                   ProductResponse response = ProductMapper.toDto(product,img);
+                   productResponses.add(response);
+               }
+       );
+       return new ProductListResponse(productResponses,ids.getNumber(),ids.getTotalPages());
     }
 
-    public Product save(ProductDto productDto, int sellerId){
+    public Product save(ProductRequest productRequest, int sellerId){
 
-        Product product = ProductMapper.toEntity(productDto);
+        Product product = ProductMapper.toEntity(productRequest);
         Seller seller = sellerRepository.findById(sellerId).orElseThrow(RuntimeException::new);
         product.setSeller(seller);
         return productRepository.save(product);
@@ -62,11 +86,12 @@ public class SellerService {
     public void delete(int sellerId, int id){
         productRepository.deleteProductByIdAndSeller(id,sellerId);
     }
-    public Product update(ProductDto productDto,int sellerId,int productId){
-        Product updatedProductDetails = ProductMapper.toEntity(productDto);
+    public Product update(ProductRequest productRequest, int sellerId, int productId){
+        Product updatedProductDetails = ProductMapper.toEntity(productRequest);
         Product productToBeUpdated = productRepository.findProductByIdAndSeller(productId,sellerId).orElseThrow(
                 ()-> new EntityNotFoundException("id: "+productId+" doesn't exists. Cannot be updated"));
         //copy non null fields
+
         utilsCopy(updatedProductDetails,productToBeUpdated);
         return productRepository.save(productToBeUpdated);
      }
@@ -94,4 +119,35 @@ public class SellerService {
          }
 
      }
+
+     @Transactional(readOnly = false,rollbackFor = {RuntimeException.class, StorageException.class} )
+    public void saveImage(int sellerId, Integer productId, MultipartFile fileToBeUploaded) {
+        Product product = productRepository.findProductByIdAndSeller(productId,sellerId).orElseThrow(
+                 ()-> new EntityNotFoundException("id: "+productId+" doesn't exists. Cannot be uploaded"));
+
+        String imageNameForProduct = fileService.save(fileToBeUploaded);
+        product.setImage(imageNameForProduct);
+    }
+    public ImageDto getImage(int sellerId, int productId){
+        String nameImg = productRepository.findImageBySellerIdAndId(productId,sellerId);
+        if (nameImg == null) return null;
+        byte[] imgAsBytes = fileService.loadFileAsBytes(nameImg);
+        String extension = StringUtils.getFilenameExtension(nameImg);
+        MediaType mt = switch (extension) {
+            case "png" -> MediaType.IMAGE_PNG;
+            case "jpg","jpeg" -> MediaType.IMAGE_JPEG;
+            // Add more cases for other supported formats
+            default -> throw new IllegalArgumentException("Unsupported image format: " + extension);
+        };
+        return new ImageDto(imgAsBytes,mt);
+    }
+    @Transactional(readOnly = false,rollbackFor = {RuntimeException.class, StorageException.class} )
+    public void updateImage(int sellerId, Integer productId, MultipartFile fileToBeUploaded) {
+        Product product = productRepository.findProductByIdAndSeller(productId,sellerId).orElseThrow(
+                ()-> new EntityNotFoundException("id: "+productId+" doesn't exists. Cannot be updated"));
+        if(product.getImage()==null){
+            saveImage(sellerId,productId,fileToBeUploaded);
+        }
+        fileService.update(fileToBeUploaded,product.getImage());
+    }
 }
