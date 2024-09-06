@@ -35,8 +35,7 @@ public class AppUser implements Serializable, UserDetails, CredentialsContainer 
 
     @Column(nullable = false)
     private Boolean twoFactorEnabled;
-    @Column(nullable = false, unique = true)
-    private String phoneNumber;
+
     @Embedded
     private Address address;
 
