@@ -40,7 +40,7 @@ public class SellerService {
     public Optional<ProductResponse> getProduct(int id, int sellerId){
          Optional<Product> product = productRepository.findProductByIdAndSeller(id,sellerId);
          if (product.isEmpty()){
-             Optional.empty();
+             return Optional.empty();
          }
          Product toBeMapped = product.get();
          byte[] img =  fileService.loadFileAsBytes(product.get().getImage());
@@ -76,12 +76,12 @@ public class SellerService {
        return new ProductListResponse(productResponses,ids.getNumber(),ids.getTotalPages());
     }
 
-    public Product save(ProductRequest productRequest, int sellerId){
+    public ProductResponse save(ProductRequest productRequest, int sellerId){
 
         Product product = ProductMapper.toEntity(productRequest);
-        Seller seller = sellerRepository.findById(sellerId).orElseThrow(RuntimeException::new);
+        Seller seller = sellerRepository.getReferenceById(sellerId);
         product.setSeller(seller);
-        return productRepository.save(product);
+        return ProductMapper.toDto(productRepository.save(product),null);
     }
     public void delete(int sellerId, int id){
         productRepository.deleteProductByIdAndSeller(id,sellerId);

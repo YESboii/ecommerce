@@ -45,8 +45,8 @@ public class SellerController {
         return new ResponseEntity<>(products,HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<Product> saveProduct(@Valid @RequestBody ProductRequest productToBeSaved, @PathVariable("id") int sellerId){
-        Product savedProduct = sellerService.save(productToBeSaved,sellerId);
+    public ResponseEntity<ProductResponse> saveProduct(@Valid @RequestBody ProductRequest productToBeSaved, @PathVariable("id") int sellerId){
+        ProductResponse savedProduct = sellerService.save(productToBeSaved,sellerId);
         return new ResponseEntity<>(savedProduct,HttpStatus.CREATED);
     }
     @DeleteMapping("/{product-id}")

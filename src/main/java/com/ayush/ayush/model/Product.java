@@ -4,9 +4,7 @@ package com.ayush.ayush.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,7 +12,8 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,4 +60,6 @@ public class Product {
         return Objects.hash(id);
     }
 
+    public Product() {
+    }
 }
