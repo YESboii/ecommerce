@@ -120,7 +120,7 @@ public class SellerService {
 
      }
 
-     @Transactional(readOnly = false,rollbackFor = {RuntimeException.class, StorageException.class} )
+     @Transactional(rollbackFor = {RuntimeException.class, StorageException.class} )
     public void saveImage(int sellerId, Integer productId, MultipartFile fileToBeUploaded) {
         Product product = productRepository.findProductByIdAndSeller(productId,sellerId).orElseThrow(
                  ()-> new EntityNotFoundException("id: "+productId+" doesn't exists. Cannot be uploaded"));
@@ -133,6 +133,9 @@ public class SellerService {
         if (nameImg == null) return null;
         byte[] imgAsBytes = fileService.loadFileAsBytes(nameImg);
         String extension = StringUtils.getFilenameExtension(nameImg);
+        if(extension==null){
+            throw new RuntimeException("Image: %s does not have a file extension".formatted(nameImg));
+        }
         MediaType mt = switch (extension) {
             case "png" -> MediaType.IMAGE_PNG;
             case "jpg","jpeg" -> MediaType.IMAGE_JPEG;
@@ -141,7 +144,7 @@ public class SellerService {
         };
         return new ImageDto(imgAsBytes,mt);
     }
-    @Transactional(readOnly = false,rollbackFor = {RuntimeException.class, StorageException.class} )
+    @Transactional(rollbackFor = {RuntimeException.class, StorageException.class} )
     public void updateImage(int sellerId, Integer productId, MultipartFile fileToBeUploaded) {
         Product product = productRepository.findProductByIdAndSeller(productId,sellerId).orElseThrow(
                 ()-> new EntityNotFoundException("id: "+productId+" doesn't exists. Cannot be updated"));
