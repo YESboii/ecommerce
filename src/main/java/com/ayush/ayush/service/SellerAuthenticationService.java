@@ -44,7 +44,7 @@ public class SellerAuthenticationService implements AuthenticationService{
     }
 
     //1- Find Seller By email
-    //If Found user already exists, throw exception, and notify client that email exists try to  generate
+    //If Found user already exists, throw exception, and notify client that email exists try to check email/ generate
     //new key
     public void register(SellerRegistrationRequest request) {
         Optional<Seller> s = sellerRepository.findByUsername(request.getUsername());
