@@ -27,7 +27,8 @@ public class SellerController {
 
     private final SellerService sellerService;
     @GetMapping(value = "/{product-id}",produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ProductResponse> getById(@PathVariable("product-id") int productId, @PathVariable("id") int sellerId){
+    public ResponseEntity<ProductResponse> getById(@PathVariable("product-id") int productId,
+                                                   @PathVariable("id") Long sellerId){
         Optional<ProductResponse> product = sellerService.getProduct(productId, sellerId);
         if (product.isPresent()){
             return ResponseEntity.ok(product.get());
@@ -39,18 +40,18 @@ public class SellerController {
                                                            @RequestParam(value = "size",required = false,defaultValue = AppConstants.PAGE_SIZE)int size,
                                                            @RequestParam(value = "sort",required = false,defaultValue = AppConstants.SORT_DIR)String sort,
                                                            @RequestParam(value = "parameter",required = false)String name,
-                                                           @PathVariable("id") Integer sellerId){
+                                                           @PathVariable("id") Long sellerId){
         ProductListResponse products = sellerService.getProducts(sellerId,page,size,sort,name);
 
         return new ResponseEntity<>(products,HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<ProductResponse> saveProduct(@Valid @RequestBody ProductRequest productToBeSaved, @PathVariable("id") int sellerId){
+    public ResponseEntity<ProductResponse> saveProduct(@Valid @RequestBody ProductRequest productToBeSaved, @PathVariable("id") Long sellerId){
         ProductResponse savedProduct = sellerService.save(productToBeSaved,sellerId);
         return new ResponseEntity<>(savedProduct,HttpStatus.CREATED);
     }
     @DeleteMapping("/{product-id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable("product-id") int productId, @PathVariable("id") int sellerId){
+    public ResponseEntity<Void> deleteProduct(@PathVariable("product-id") int productId, @PathVariable("id") Long sellerId){
         sellerService.delete(sellerId,productId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -58,7 +59,7 @@ public class SellerController {
                 produces = MediaType.APPLICATION_JSON_VALUE,
                 consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Product> updateProduct(@PathVariable("product-id") int productId,
-                                                 @PathVariable("id") int sellerId,
+                                                 @PathVariable("id") Long sellerId,
                                                  @RequestBody @Valid ProductRequest productUpdated){
         Product updatedProduct = sellerService.update(productUpdated,sellerId,productId);
         return new ResponseEntity<>(updatedProduct,HttpStatus.OK);
@@ -66,14 +67,14 @@ public class SellerController {
 
     @PostMapping(value = "/{productId}/img",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile fileToBeUploaded,
-                                             @PathVariable("id")int sellerId, @PathVariable("productId") Integer productId){
+                                             @PathVariable("id")Long sellerId, @PathVariable("productId") Integer productId){
 
         sellerService.saveImage(sellerId,productId,fileToBeUploaded);
 
         return new ResponseEntity<>("Image Uploaded for productId: %s".formatted(productId),HttpStatus.OK);
     }
     @GetMapping(value = "/{productId}/img")
-    public ResponseEntity<byte[]> getFile(@PathVariable("id")int sellerId,
+    public ResponseEntity<byte[]> getFile(@PathVariable("id")Long sellerId,
                                           @PathVariable("productId") Integer productId){
 
         ImageDto dto = sellerService.getImage(sellerId,productId);
@@ -86,7 +87,7 @@ public class SellerController {
     }
     @PutMapping(value = "/{productId}/img",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateFile(@RequestParam("image") MultipartFile fileToBeUploaded,
-                                             @PathVariable("id")int sellerId, @PathVariable("productId") Integer productId){
+                                             @PathVariable("id")Long sellerId, @PathVariable("productId") Integer productId){
 
         sellerService.updateImage(sellerId,productId,fileToBeUploaded);
 

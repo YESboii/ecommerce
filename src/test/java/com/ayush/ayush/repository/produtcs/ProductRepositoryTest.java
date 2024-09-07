@@ -34,12 +34,12 @@ public class ProductRepositoryTest {
 
     @Test
     public void testThatProductProductRepositoryReturnsImage(){
-        String imageName = productRepository.findImageBySellerIdAndId(3,2);
+        String imageName = productRepository.findImageBySellerIdAndId(3,2L);
         assertThat(imageName).isNotNull().isEqualTo("image_b1.jpg");
     }
     @Test
     public void testThatProductProductRepositoryReturnsNullWhenNoImageFound(){
-        String imageName = productRepository.findImageBySellerIdAndId(5,2);
+        String imageName = productRepository.findImageBySellerIdAndId(5,2L);
         assertThat(imageName).isNull();
     }
 }

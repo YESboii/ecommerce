@@ -37,7 +37,7 @@ public class SellerService {
     private final FileService fileService;
 
 
-    public Optional<ProductResponse> getProduct(int id, int sellerId){
+    public Optional<ProductResponse> getProduct(int id, Long sellerId){
          Optional<Product> product = productRepository.findProductByIdAndSeller(id,sellerId);
          if (product.isEmpty()){
              return Optional.empty();
@@ -49,7 +49,7 @@ public class SellerService {
     }
 
 
-    public ProductListResponse getProducts(int sellerId, int page, int size, String sortDirection, String sortBy) {
+    public ProductListResponse getProducts(Long sellerId, int page, int size, String sortDirection, String sortBy) {
 
         Sort sort = Sort.unsorted();
         if (sortBy != null && (sortBy.equalsIgnoreCase("quantity")
@@ -76,17 +76,17 @@ public class SellerService {
        return new ProductListResponse(productResponses,ids.getNumber(),ids.getTotalPages());
     }
 
-    public ProductResponse save(ProductRequest productRequest, int sellerId){
+    public ProductResponse save(ProductRequest productRequest, Long sellerId){
 
         Product product = ProductMapper.toEntity(productRequest);
         Seller seller = sellerRepository.getReferenceById(sellerId);
         product.setSeller(seller);
         return ProductMapper.toDto(productRepository.save(product),null);
     }
-    public void delete(int sellerId, int id){
+    public void delete(Long sellerId, int id){
         productRepository.deleteProductByIdAndSeller(id,sellerId);
     }
-    public Product update(ProductRequest productRequest, int sellerId, int productId){
+    public Product update(ProductRequest productRequest, Long sellerId, int productId){
         Product updatedProductDetails = ProductMapper.toEntity(productRequest);
         Product productToBeUpdated = productRepository.findProductByIdAndSeller(productId,sellerId).orElseThrow(
                 ()-> new EntityNotFoundException("id: "+productId+" doesn't exists. Cannot be updated"));
@@ -121,14 +121,14 @@ public class SellerService {
      }
 
      @Transactional(rollbackFor = {RuntimeException.class, StorageException.class} )
-    public void saveImage(int sellerId, Integer productId, MultipartFile fileToBeUploaded) {
+    public void saveImage(Long sellerId, Integer productId, MultipartFile fileToBeUploaded) {
         Product product = productRepository.findProductByIdAndSeller(productId,sellerId).orElseThrow(
                  ()-> new EntityNotFoundException("id: "+productId+" doesn't exists. Cannot be uploaded"));
 
         String imageNameForProduct = fileService.save(fileToBeUploaded);
         product.setImage(imageNameForProduct);
     }
-    public ImageDto getImage(int sellerId, int productId){
+    public ImageDto getImage(Long sellerId, int productId){
         String nameImg = productRepository.findImageBySellerIdAndId(productId,sellerId);
         if (nameImg == null) return null;
         byte[] imgAsBytes = fileService.loadFileAsBytes(nameImg);
@@ -145,7 +145,7 @@ public class SellerService {
         return new ImageDto(imgAsBytes,mt);
     }
     @Transactional(rollbackFor = {RuntimeException.class, StorageException.class} )
-    public void updateImage(int sellerId, Integer productId, MultipartFile fileToBeUploaded) {
+    public void updateImage(Long sellerId, Integer productId, MultipartFile fileToBeUploaded) {
         Product product = productRepository.findProductByIdAndSeller(productId,sellerId).orElseThrow(
                 ()-> new EntityNotFoundException("id: "+productId+" doesn't exists. Cannot be updated"));
         if(product.getImage()==null){

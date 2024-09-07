@@ -41,10 +41,10 @@ public class SellerServiceUnitTest {
     @Test
     public void testGetProductReturnsOptionalEmptyWhenNoneFound(){
         //mock
-        when(productRepository.findProductByIdAndSeller(5,2)).thenReturn(Optional.empty());
+        when(productRepository.findProductByIdAndSeller(5,2L)).thenReturn(Optional.empty());
 
         //test the unit in isolation
-        Optional<ProductResponse> product = underTest.getProduct(5,2);
+        Optional<ProductResponse> product = underTest.getProduct(5,2L);
 
         //assert
         assertTrue(product.isEmpty());
@@ -53,12 +53,12 @@ public class SellerServiceUnitTest {
     public void testGetProductReturnsProductWhenFound(){
 
         //mock
-        when(productRepository.findProductByIdAndSeller(4,2))
+        when(productRepository.findProductByIdAndSeller(4,2L))
                 .thenReturn(Optional.of
                         (Utils.buildProduct()));
 
         //test the unit in isolation
-        Optional<ProductResponse> product = underTest.getProduct(4,2);
+        Optional<ProductResponse> product = underTest.getProduct(4,2L);
 
         //assert
         assertTrue(product.isPresent());
@@ -68,8 +68,8 @@ public class SellerServiceUnitTest {
     }
     @Test
     void getImageReturnsNullIfNoImageFound(){
-        when(productRepository.findImageBySellerIdAndId(5,5)).thenReturn(null);
-        ImageDto imageDto = underTest.getImage(5,5);
+        when(productRepository.findImageBySellerIdAndId(5,5L)).thenReturn(null);
+        ImageDto imageDto = underTest.getImage(5L,5);
         assertTrue(imageDto==null);
     }
     @Test
@@ -77,14 +77,14 @@ public class SellerServiceUnitTest {
         String imgName = "image.jpg";
         byte []img = new byte[]{1,2,3};
 
-        when(productRepository.findImageBySellerIdAndId(4,2)).thenReturn(imgName);
+        when(productRepository.findImageBySellerIdAndId(4,2L)).thenReturn(imgName);
         when(fileService.loadFileAsBytes(imgName)).thenReturn(img);
 
-        ImageDto imageDto = underTest.getImage(2,4);
+        ImageDto imageDto = underTest.getImage(2L,4);
 
         assertTrue(Arrays.equals(img,imageDto.imgAsBytes()));
         assertThat(imageDto.mediaType()).isEqualTo(MediaType.IMAGE_JPEG);
-        verify(productRepository,times(1)).findImageBySellerIdAndId(4,2);
+        verify(productRepository,times(1)).findImageBySellerIdAndId(4,2L);
         verify(fileService).loadFileAsBytes(imgName);
     }
     @Test
@@ -92,12 +92,12 @@ public class SellerServiceUnitTest {
         String imgName = "image.jpeg";
         byte []img = new byte[]{1,2,3};
 
-        when(productRepository.findImageBySellerIdAndId(4,2)).thenReturn(imgName);
+        when(productRepository.findImageBySellerIdAndId(4,2L)).thenReturn(imgName);
         when(fileService.loadFileAsBytes(imgName)).thenReturn(img);
-        ImageDto imageDto = underTest.getImage(2,4);
+        ImageDto imageDto = underTest.getImage(2L,4);
         assertTrue(Arrays.equals(img,imageDto.imgAsBytes()));
         assertThat(imageDto.mediaType()).isEqualTo(MediaType.IMAGE_JPEG);
-        verify(productRepository,times(1)).findImageBySellerIdAndId(4,2);
+        verify(productRepository,times(1)).findImageBySellerIdAndId(4,2L);
         verify(fileService).loadFileAsBytes(imgName);
     }
     @Test
@@ -105,12 +105,12 @@ public class SellerServiceUnitTest {
         String imgName = "image.png";
         byte []img = new byte[]{1,2,3};
 
-        when(productRepository.findImageBySellerIdAndId(4,2)).thenReturn(imgName);
+        when(productRepository.findImageBySellerIdAndId(4,2L)).thenReturn(imgName);
         when(fileService.loadFileAsBytes(imgName)).thenReturn(img);
-        ImageDto imageDto = underTest.getImage(2,4);
+        ImageDto imageDto = underTest.getImage(2L,4);
         assertTrue(Arrays.equals(img,imageDto.imgAsBytes()));
         assertThat(imageDto.mediaType()).isEqualTo(MediaType.IMAGE_PNG);
-        verify(productRepository,times(1)).findImageBySellerIdAndId(4,2);
+        verify(productRepository,times(1)).findImageBySellerIdAndId(4,2L);
         verify(fileService).loadFileAsBytes(imgName);
     }
 
@@ -123,10 +123,10 @@ public class SellerServiceUnitTest {
         ProductResponse expected = Utils.buildProductResponseWithoutImage();
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
-        ProductResponse productResponse = underTest.save(productRequest,2);
+        ProductResponse productResponse = underTest.save(productRequest,2L);
 
         assertThat(productResponse.id()).isEqualTo(expected.id());
-        verify(sellerRepositoryJpa,times(1)).getReferenceById(2);
+        verify(sellerRepositoryJpa,times(1)).getReferenceById(2L);
         verify(productRepository).save(any(Product.class));
 
     }

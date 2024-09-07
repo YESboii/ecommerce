@@ -10,5 +10,5 @@ import java.util.List;
 @Setter
 public final class SellerRegistrationRequest extends RegistrationRequest {
     private String gstId;
-    private List<SellerCategory> categories;
+    private List<SellerCategoryDto> categories;
 }

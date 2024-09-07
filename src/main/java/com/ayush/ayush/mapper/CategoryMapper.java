@@ -2,10 +2,13 @@ package com.ayush.ayush.mapper;
 
 import com.ayush.ayush.dto.CategoryDto;
 
+import com.ayush.ayush.dto.SellerCategoryDto;
 import com.ayush.ayush.model.ProductCategory;
+import com.ayush.ayush.model.SellerCategory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class CategoryMapper {
@@ -37,5 +40,16 @@ public class CategoryMapper {
         }
 
         return category;
+    }
+    public static List<SellerCategory> toSellerCategoryEntity(List<SellerCategoryDto> dtoList) {
+        if (dtoList == null) {
+            return null;
+        }
+        return dtoList.stream().map(dto -> {
+            SellerCategory category = new SellerCategory();
+            category.setId(dto.getId());
+            category.setName(dto.getName());
+            return category;
+        }).collect(Collectors.toList());
     }
 }

@@ -15,11 +15,11 @@ public interface ProductRepository extends JpaRepository<Product,Integer> {
 
     @Transactional(readOnly = true)
     @Query("SELECT p from Product p join fetch p.categories where p.id=:id and p.seller.id = :sellerId")
-    Optional<Product> findProductByIdAndSeller(int id, int sellerId);
+    Optional<Product> findProductByIdAndSeller(int id, Long sellerId);
 
     @Transactional(readOnly = true)
     @Query("SELECT p.id from Product p where p.seller.id = :sellerId")
-    Page<Long> findProductIdsBySellerPagination(int sellerId, Pageable pageable);
+    Page<Long> findProductIdsBySellerPagination(Long sellerId, Pageable pageable);
 
     @Transactional(readOnly = true)
     @Query("SELECT p from Product p join fetch p.categories c where p.id in :ids")
@@ -29,10 +29,10 @@ public interface ProductRepository extends JpaRepository<Product,Integer> {
     @Modifying
     @Transactional(readOnly = false)
     @Query("DELETE from Product p where p.id=:id and p.seller.id = :sellerId")
-    void deleteProductByIdAndSeller(int id, int sellerId);
+    void deleteProductByIdAndSeller(int id, Long sellerId);
 
     @Transactional(readOnly = true)
     @Query("SELECT p.image from Product p where p.id=:id and p.seller.id=:sellerId")
-    String findImageBySellerIdAndId(int id,int sellerId);
+    String findImageBySellerIdAndId(int id,Long sellerId);
 }
 
