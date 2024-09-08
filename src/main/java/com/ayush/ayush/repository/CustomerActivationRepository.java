@@ -10,11 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 public interface CustomerActivationRepository extends JpaRepository<CustomerActivation, Long> {
-    @Modifying
-    @Transactional
-    @Query("""
-            select c from CustomerActivation ca join ca.customer c where ca.key = :key
-            """)
-    Optional<Customer> findCustomerByActivationKey(String key);
+
+    @Transactional(readOnly = true)
+    Optional<CustomerActivation> findByKey(String key);
 
 }

@@ -1,5 +1,6 @@
 package com.ayush.ayush.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,10 +8,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.context.NullSecurityContextRepository;
+
 /*
 * TO SOLVE THE PROBLEM OF AUTHENTICATING SELLER AND CUSTOMER FOR USING DIFFERENT USER_DETAILS_SERVICE
 * WHAT WE CAN DO IS CREATE TWO SUBCLASSES OF USERNAME_PASSWORD_AUTHENTICATION_TOKEN
@@ -23,13 +28,24 @@ import org.springframework.security.web.SecurityFilterChain;
 * SUPER.AUTHENTICATE(TOKEN(CASTED_TO_UPA TOKEN)) AND SAME FOR CUSTOMER.
 * */
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter authenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .authorizeHttpRequests(auth ->
+                        auth.requestMatchers("/auth/seller/**").permitAll()
+                                .anyRequest().authenticated()
+                        )
+                .addFilterBefore(authenticationFilter, AuthorizationFilter.class)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        )
+                .securityContext(context -> context.securityContextRepository(new NullSecurityContextRepository()))
                 .build();
     }
     @Bean

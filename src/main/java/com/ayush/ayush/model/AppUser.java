@@ -20,7 +20,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class AppUser implements Serializable, UserDetails, CredentialsContainer {
+public class AppUser implements Serializable, UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,8 +70,4 @@ public class AppUser implements Serializable, UserDetails, CredentialsContainer 
         return UserDetails.super.isCredentialsNonExpired();
     }
 
-    @Override
-    public void eraseCredentials() {
-        this.password = null;
-    }
 }

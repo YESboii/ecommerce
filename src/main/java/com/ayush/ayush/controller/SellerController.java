@@ -6,12 +6,14 @@ import com.ayush.ayush.dto.ImageDto;
 import com.ayush.ayush.dto.ProductRequest;
 import com.ayush.ayush.dto.ProductResponse;
 import com.ayush.ayush.model.Product;
+import com.ayush.ayush.model.Seller;
 import com.ayush.ayush.service.SellerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +28,11 @@ import java.util.Optional;
 public class SellerController {
 
     private final SellerService sellerService;
+    @GetMapping("/test")
+    public ResponseEntity<Long> test(Authentication authentication){
+        System.out.println(authentication.getPrincipal()==null);
+        return  ResponseEntity.ok(((Seller)authentication.getPrincipal()).getId());
+    }
     @GetMapping(value = "/{product-id}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductResponse> getById(@PathVariable("product-id") int productId,
                                                    @PathVariable("id") Long sellerId){

@@ -13,7 +13,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(indexes = {@Index(name="username_idx",columnList = "username"), @Index(name="phone_idx", columnList = "phoneNumber")})
+@Table(indexes = {@Index(name="username_idx",columnList = "username")})
 public class Seller extends AppUser{
     @Column(unique = true, nullable = false)
     private String gstId;

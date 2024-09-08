@@ -10,10 +10,7 @@ import java.util.Optional;
 
 public interface SellerActivationRepository extends JpaRepository<SellerActivation,Long> {
 
-    @Modifying
-    @Transactional
-    @Query("""
-            SELECT s FROM SellerActivation sa join sa.seller s where sa.key = :key
-            """)
-    Optional<Seller> findSellerByActivationKey(String key);
+
+    @Transactional(readOnly = true)
+    Optional<SellerActivation> findByKey(String key);
 }
