@@ -5,6 +5,7 @@ import com.ayush.ayush.dto.AuthenticationResponse;
 import com.ayush.ayush.dto.SellerRegistrationRequest;
 import com.ayush.ayush.service.SellerAuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class SellerAuthenticationController {
         authenticationService.register(request);
         return ResponseEntity.ok("Registration successful!!");
     }
-    @PostMapping("/authenticate")
+    @PostMapping(value = "/authenticate",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthenticationResponse> authenticateSeller(@RequestBody AuthenticationRequest request){
         AuthenticationResponse response = authenticationService.authenticate(request);
         return ResponseEntity.ok(response);

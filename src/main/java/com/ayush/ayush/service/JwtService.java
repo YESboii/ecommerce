@@ -78,6 +78,9 @@ public class JwtService {
     public void saveAllTokensSeller(List<TokenSeller> list){
         tokenSellerRepository.saveAll(list);
     }
+    public void saveAllTokensCustomer(List<TokenCustomer> list){
+        tokenCustomerRepository.saveAll(list);
+    }
     public Long getIdClaim(String jwt){
         return getAllClaims(jwt).get("id", Long.class);
     }

@@ -1,0 +1,14 @@
+spring.datasource.url=jdbc:h2:mem:testdb;MODE=MySQL  # Use H2 in-memory database with MySQL mode
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=password
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=true
+spring.main.allow-bean-definition-overriding=true
+app.registration.seller.base.uri=http://localhost:8080/auth/seller/activate/
+app.registration.customer.base.uri=http://localhost:8080/auth/customer/activate/
+app.app-email=
+app.app-password=
+app.jwt.secret=5388399e24eb3a74f16d5f8c7c7ec2f7f6a5b43ea3ca686586077d6861421582
+app.jwt.access=3600000
+app.jwt.refresh=2592000000

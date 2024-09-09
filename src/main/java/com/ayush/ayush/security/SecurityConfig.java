@@ -1,9 +1,11 @@
 package com.ayush.ayush.security;
 
+import com.ayush.ayush.model.embeddedable.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.context.NullSecurityContextRepository;
 
 /*
@@ -38,7 +41,9 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/auth/seller/**").permitAll()
+                        auth.requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/api/*/seller/**").hasAuthority(Role.SELLER.getAuthority())
+                                .requestMatchers("/api/*/customer/**").hasAuthority(Role.CUSTOMER.getAuthority())
                                 .anyRequest().authenticated()
                         )
                 .addFilterBefore(authenticationFilter, AuthorizationFilter.class)
@@ -46,6 +51,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                         )
                 .securityContext(context -> context.securityContextRepository(new NullSecurityContextRepository()))
+                .exceptionHandling(e ->
+                        e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        )
                 .build();
     }
     @Bean
