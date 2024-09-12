@@ -1,10 +1,15 @@
 package com.ayush.ayush.security;
 
 
+import com.ayush.ayush.exceptions.JwtException;
 import com.ayush.ayush.model.embeddedable.Role;
 import com.ayush.ayush.repository.CustomerRepository;
 import com.ayush.ayush.repository.SellerRepositoryJpa;
 import com.ayush.ayush.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -72,10 +77,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.setContext(context);
             }
             filterChain.doFilter(request, response);
-        }catch (Exception e){
+        }catch (MalformedJwtException | SignatureException | ExpiredJwtException | UnsupportedJwtException e){
             //catch and rethrow subclasses of Authentication Exception to delegate it to the
             //Exception Translation Filter
             System.out.println(e.getClass());
+            throw new JwtException(jwt, e);
+
         }
     }
 }

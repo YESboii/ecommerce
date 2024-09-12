@@ -2,7 +2,6 @@ package com.ayush.ayush.service;
 
 import com.ayush.ayush.exceptions.StorageException;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
