@@ -16,13 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.security.Principal;
 import java.util.Optional;
 
-/*
-* The Seller id in the URI is not required because we can fet it from the JWT
-* */
+
 @RestController
 @RequestMapping("/api/v1/seller/products")
 @RequiredArgsConstructor
