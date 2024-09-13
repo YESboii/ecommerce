@@ -19,7 +19,8 @@ import java.util.Map;
 public class ControllerExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ValidationErrorResponse> handleValidationException(MethodArgumentNotValidException exception,HttpServletRequest request){
+    public ResponseEntity<ValidationErrorResponse> handleValidationException(MethodArgumentNotValidException exception,
+                                                                             HttpServletRequest request){
         Map<String, String> errorMap = new HashMap<>();
         exception.getBindingResult().getAllErrors().forEach(
                 (error) ->{
@@ -39,16 +40,11 @@ public class ControllerExceptionHandler {
 
     }
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<GeneralErrorResponse> handleEntityNotFoundException(EntityNotFoundException e, HttpServletRequest request){
-        GeneralErrorResponse response = GeneralErrorResponse.builder()
-                .status(HttpStatus.BAD_REQUEST.value())
-                .message(e.getMessage())
-                .path(request.getRequestURI())
-                .timestamp(LocalDateTime.now())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .build();
-        return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+    public ResponseEntity<GeneralErrorResponse> handleEntityNotFoundException(EntityNotFoundException e,
+                                                                              HttpServletRequest request){
+        return responseBuilder(HttpStatus.BAD_REQUEST,request,e);
     }
+    //It's commented out in dev so that we can catch edge cases for exceptions that are not caught
 //    @ExceptionHandler(Exception.class)
 //    public ResponseEntity<GeneralErrorResponse> handleServerErrorException(HttpServletRequest request){
 //        GeneralErrorResponse response = GeneralErrorResponse.builder()
@@ -61,7 +57,43 @@ public class ControllerExceptionHandler {
 //        return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
 //    }
     @ExceptionHandler(StorageException.class)
-    public ResponseEntity<String> handlee(Exception e ){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<GeneralErrorResponse> handleStorageExceptions(StorageException e,
+                                                                        HttpServletRequest request){
+        return responseBuilder(HttpStatus.INTERNAL_SERVER_ERROR,request, e);
+    }
+    @ExceptionHandler(EmailServiceException.class)
+    public ResponseEntity<GeneralErrorResponse> handleEmailServiceException(EmailServiceException e,
+                                                                            HttpServletRequest request){
+        return responseBuilder(HttpStatus.INTERNAL_SERVER_ERROR,request, e);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<GeneralErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException e,
+                                                                                 HttpServletRequest request){
+        return responseBuilder(HttpStatus.BAD_REQUEST, request,e);
+    }
+    @ExceptionHandler(UserDoesNotExistsException.class)
+    public ResponseEntity<GeneralErrorResponse> handleUserDoesNotExistsException(UserDoesNotExistsException e,
+                                                                                 HttpServletRequest request){
+        return responseBuilder(HttpStatus.BAD_REQUEST, request,e);
+    }
+    @ExceptionHandler(RegistrationLinkExpiredException.class)
+    public ResponseEntity<GeneralErrorResponse> handleRegistrationLinkExpiredException(RegistrationLinkExpiredException e,
+                                                                                 HttpServletRequest request){
+        return responseBuilder(HttpStatus.BAD_REQUEST, request,e);
+    }
+
+
+    private ResponseEntity<GeneralErrorResponse> responseBuilder(HttpStatus httpStatus,
+                                                                 HttpServletRequest request,
+                                                                 Exception e){
+        GeneralErrorResponse response = GeneralErrorResponse.builder()
+                .status(httpStatus.value())
+                .message(e.getMessage())
+                .path(request.getRequestURI())
+                .timestamp(LocalDateTime.now())
+                .error(httpStatus.getReasonPhrase())
+                .build();
+        return new ResponseEntity<>(response,httpStatus);
     }
 }

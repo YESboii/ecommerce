@@ -5,6 +5,7 @@ import com.ayush.ayush.dto.AuthenticationResponse;
 import com.ayush.ayush.dto.CustomerRegistrationRequest;
 import com.ayush.ayush.exceptions.RegistrationLinkExpiredException;
 import com.ayush.ayush.exceptions.UserAlreadyExistsException;
+import com.ayush.ayush.exceptions.UserDoesNotExistsException;
 import com.ayush.ayush.mapper.CustomerMapper;
 import com.ayush.ayush.model.*;
 import com.ayush.ayush.model.embeddedable.Role;
@@ -101,7 +102,7 @@ public class CustomerAuthenticationService implements AuthenticationService{
     @Override
     public boolean activate(String registrationKey) {
         CustomerActivation customerActivation = customerActivationRepository.findByKey(registrationKey).orElseThrow(
-                () -> new UsernameNotFoundException("User does not exist, Invalid registration key!!")
+                () -> new UserDoesNotExistsException("User does not exist, Invalid registration key!!")
         );
         if (customerActivation.getExpiryTime().isBefore(LocalDateTime.now())){
             throw new RegistrationLinkExpiredException("The Registration link has expired!");
