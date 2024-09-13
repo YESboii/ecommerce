@@ -132,7 +132,7 @@ public class Tests {
         String jwt = node.get("access_token").asText();
 
         mockMvc.perform(
-                get("/api/v1/seller/1/products/test")
+                get("/api/v1/seller/products/test")
                         .header(HttpHeaders.AUTHORIZATION,"Bearer %s".formatted(jwt))
         ).andExpect(status().isOk()).andExpect(content().string("1"));
     }
@@ -141,7 +141,7 @@ public class Tests {
     @WithMockUser(authorities = "CUSTOMER")
     public void testThatAuthorizationForSellerApiReturnsForbidden()throws Exception{
         mockMvc.perform(
-                get("/api/v1/seller/1/products/test")
+                get("/api/v1/seller/products/test")
         ).andExpect(status().isForbidden());
 
     }

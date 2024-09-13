@@ -18,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.context.NullSecurityContextRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
 
 /*
 * TO SOLVE THE PROBLEM OF AUTHENTICATING SELLER AND CUSTOMER FOR USING DIFFERENT USER_DETAILS_SERVICE
@@ -33,13 +34,12 @@ import org.springframework.security.web.context.NullSecurityContextRepository;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final JwtAuthenticationFilter authenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception {
         return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
+//                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/api/*/seller/**").hasAuthority(Role.SELLER.getAuthority())

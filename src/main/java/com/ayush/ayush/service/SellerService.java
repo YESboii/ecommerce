@@ -86,14 +86,17 @@ public class SellerService {
     public void delete(Long sellerId, int id){
         productRepository.deleteProductByIdAndSeller(id,sellerId);
     }
-    public Product update(ProductRequest productRequest, Long sellerId, int productId){
+    public ProductResponse update(ProductRequest productRequest, Long sellerId, int productId){
         Product updatedProductDetails = ProductMapper.toEntity(productRequest);
         Product productToBeUpdated = productRepository.findProductByIdAndSeller(productId,sellerId).orElseThrow(
                 ()-> new EntityNotFoundException("id: "+productId+" doesn't exists. Cannot be updated"));
         //copy non null fields
 
         utilsCopy(updatedProductDetails,productToBeUpdated);
-        return productRepository.save(productToBeUpdated);
+        Product p =  productRepository.save(productToBeUpdated);
+        byte[] img =  fileService.loadFileAsBytes(p.getImage());
+
+        return ProductMapper.toDto(p,img);
      }
 
      private void utilsCopy(Product source, Product target){

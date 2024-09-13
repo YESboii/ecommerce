@@ -27,7 +27,6 @@ public class SellerController {
     private final SellerService sellerService;
     @GetMapping("/test")
     public ResponseEntity<Long> test(Authentication authentication){
-        System.out.println(authentication.getPrincipal()==null);
         return  ResponseEntity.ok(getSellerId(authentication));
     }
     @GetMapping(value = "/{product-id}",produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,7 +48,7 @@ public class SellerController {
 
         return new ResponseEntity<>(products,HttpStatus.OK);
     }
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductResponse> saveProduct(@Valid @RequestBody ProductRequest productToBeSaved,
                                                        Authentication authentication){
         ProductResponse savedProduct = sellerService.save(productToBeSaved,getSellerId(authentication));
@@ -64,10 +63,10 @@ public class SellerController {
     @PutMapping(value = "/{product-id}",
                 produces = MediaType.APPLICATION_JSON_VALUE,
                 consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Product> updateProduct(@PathVariable("product-id") int productId,
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable("product-id") int productId,
                                                  Authentication authentication,
                                                  @RequestBody @Valid ProductRequest productUpdated){
-        Product updatedProduct = sellerService.update(productUpdated,getSellerId(authentication),productId);
+        ProductResponse updatedProduct = sellerService.update(productUpdated,getSellerId(authentication),productId);
         return new ResponseEntity<>(updatedProduct,HttpStatus.OK);
     }
 
