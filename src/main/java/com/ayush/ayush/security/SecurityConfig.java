@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,9 +13,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.context.NullSecurityContextRepository;
 
 /*
@@ -51,9 +51,9 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                         )
                 .securityContext(context -> context.securityContextRepository(new NullSecurityContextRepository()))
-                .exceptionHandling(e ->
-                        e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                        )
+                .exceptionHandling(e -> e
+                        .authenticationEntryPoint(customAuthenticationEntryPoint())
+                        .accessDeniedHandler(customAccessDeniedHandler()))
                 .build();
     }
     @Bean
@@ -83,5 +83,14 @@ public class SecurityConfig {
                                                        CustomerAuthenticationProvider customerAuthenticationProvider){
 
         return new ProviderManager(sellerAuthenticationProvider, customerAuthenticationProvider);
+    }
+
+    @Bean
+    public AuthenticationEntryPoint customAuthenticationEntryPoint(){
+        return new CustomAuthenticationEntryPoint();
+    }
+    @Bean
+    public AccessDeniedHandler customAccessDeniedHandler(){
+        return new CustomAccessDeniedHandlerImpl();
     }
 }

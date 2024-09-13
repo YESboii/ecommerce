@@ -9,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
 
 import java.io.IOException;
 
@@ -23,6 +21,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          AuthenticationException authException) throws IOException, ServletException {
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
         String msg = resolveExceptionMessage(authException);
 
         response.getWriter().write(msg);
