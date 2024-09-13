@@ -17,13 +17,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.Optional;
 
 /*
 * The Seller id in the URI is not required because we can fet it from the JWT
 * */
 @RestController
-@RequestMapping("/api/v1/seller/{id}/products")
+@RequestMapping("/api/v1/seller/products")
 @RequiredArgsConstructor
 public class SellerController {
 
@@ -31,12 +32,12 @@ public class SellerController {
     @GetMapping("/test")
     public ResponseEntity<Long> test(Authentication authentication){
         System.out.println(authentication.getPrincipal()==null);
-        return  ResponseEntity.ok(((Seller)authentication.getPrincipal()).getId());
+        return  ResponseEntity.ok(getSellerId(authentication));
     }
     @GetMapping(value = "/{product-id}",produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductResponse> getById(@PathVariable("product-id") int productId,
-                                                   @PathVariable("id") Long sellerId){
-        Optional<ProductResponse> product = sellerService.getProduct(productId, sellerId);
+                                                   Authentication authentication){
+        Optional<ProductResponse> product = sellerService.getProduct(productId, getSellerId(authentication));
         if (product.isPresent()){
             return ResponseEntity.ok(product.get());
         }
@@ -47,44 +48,47 @@ public class SellerController {
                                                            @RequestParam(value = "size",required = false,defaultValue = AppConstants.PAGE_SIZE)int size,
                                                            @RequestParam(value = "sort",required = false,defaultValue = AppConstants.SORT_DIR)String sort,
                                                            @RequestParam(value = "parameter",required = false)String name,
-                                                           @PathVariable("id") Long sellerId){
-        ProductListResponse products = sellerService.getProducts(sellerId,page,size,sort,name);
+                                                           Authentication authentication){
+        ProductListResponse products = sellerService.getProducts(getSellerId(authentication),page,size,sort,name);
 
         return new ResponseEntity<>(products,HttpStatus.OK);
     }
     @PostMapping
-    public ResponseEntity<ProductResponse> saveProduct(@Valid @RequestBody ProductRequest productToBeSaved, @PathVariable("id") Long sellerId){
-        ProductResponse savedProduct = sellerService.save(productToBeSaved,sellerId);
+    public ResponseEntity<ProductResponse> saveProduct(@Valid @RequestBody ProductRequest productToBeSaved,
+                                                       Authentication authentication){
+        ProductResponse savedProduct = sellerService.save(productToBeSaved,getSellerId(authentication));
         return new ResponseEntity<>(savedProduct,HttpStatus.CREATED);
     }
     @DeleteMapping("/{product-id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable("product-id") int productId, @PathVariable("id") Long sellerId){
-        sellerService.delete(sellerId,productId);
+    public ResponseEntity<Void> deleteProduct(@PathVariable("product-id") int productId,
+                                              Authentication authentication){
+        sellerService.delete(getSellerId(authentication),productId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
     @PutMapping(value = "/{product-id}",
                 produces = MediaType.APPLICATION_JSON_VALUE,
                 consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Product> updateProduct(@PathVariable("product-id") int productId,
-                                                 @PathVariable("id") Long sellerId,
+                                                 Authentication authentication,
                                                  @RequestBody @Valid ProductRequest productUpdated){
-        Product updatedProduct = sellerService.update(productUpdated,sellerId,productId);
+        Product updatedProduct = sellerService.update(productUpdated,getSellerId(authentication),productId);
         return new ResponseEntity<>(updatedProduct,HttpStatus.OK);
     }
 
     @PostMapping(value = "/{productId}/img",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(@RequestParam("image") MultipartFile fileToBeUploaded,
-                                             @PathVariable("id")Long sellerId, @PathVariable("productId") Integer productId){
+                                             Authentication authentication,
+                                             @PathVariable("productId") Integer productId){
 
-        sellerService.saveImage(sellerId,productId,fileToBeUploaded);
+        sellerService.saveImage(getSellerId(authentication),productId,fileToBeUploaded);
 
         return new ResponseEntity<>("Image Uploaded for productId: %s".formatted(productId),HttpStatus.OK);
     }
     @GetMapping(value = "/{productId}/img")
-    public ResponseEntity<byte[]> getFile(@PathVariable("id")Long sellerId,
+    public ResponseEntity<byte[]> getFile(Authentication authentication,
                                           @PathVariable("productId") Integer productId){
 
-        ImageDto dto = sellerService.getImage(sellerId,productId);
+        ImageDto dto = sellerService.getImage(getSellerId(authentication),productId);
         if (dto==null){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -94,11 +98,17 @@ public class SellerController {
     }
     @PutMapping(value = "/{productId}/img",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateFile(@RequestParam("image") MultipartFile fileToBeUploaded,
-                                             @PathVariable("id")Long sellerId, @PathVariable("productId") Integer productId){
+                                             Authentication authentication,
+                                             @PathVariable("productId") Integer productId){
 
-        sellerService.updateImage(sellerId,productId,fileToBeUploaded);
+        sellerService.updateImage(getSellerId(authentication),productId,fileToBeUploaded);
 
         return new ResponseEntity<>("Image Updated for productId: %s".formatted(productId),HttpStatus.OK);
     }
-
+    private Long getSellerId(Authentication authentication){
+        //alternate way is to extract id from the jwt token.....
+        Object principal = authentication.getPrincipal();
+        Seller seller = (Seller) principal;
+        return seller.getId();
+    }
 }
