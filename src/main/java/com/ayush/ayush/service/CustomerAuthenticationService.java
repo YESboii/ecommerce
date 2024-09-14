@@ -144,4 +144,13 @@ public class CustomerAuthenticationService implements AuthenticationService{
         return customer;
     }
 
+    public void changePassword(String key, String newPassword) {
+        Long id = getIdFromKey(key);
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        customerRepository.updatePassword(encodedNewPassword,id);
+    }
+
+    private Long getIdFromKey(String key) {
+        return Long.parseLong(key.substring(5));
+    }
 }

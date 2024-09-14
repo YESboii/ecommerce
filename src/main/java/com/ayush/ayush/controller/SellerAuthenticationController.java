@@ -50,7 +50,7 @@ public class SellerAuthenticationController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<String> verifyOtp(@Valid @RequestBody PasswordChangeRequest passwordChangeRequest){
+    public ResponseEntity<String> verifyOtp(@Valid @RequestBody PasswordChangeRequestSeller passwordChangeRequest){
         boolean isValidOtp = otpService.verifyOtp(passwordChangeRequest.key(), passwordChangeRequest.otp());
         if (isValidOtp){
             authenticationService.changePassword(passwordChangeRequest.key(), passwordChangeRequest.newPassword());

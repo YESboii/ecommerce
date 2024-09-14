@@ -11,6 +11,12 @@ import java.util.Optional;
 public interface SellerRepositoryJpa extends JpaRepository<Seller,Long>{
 
     Optional<Seller> findByUsername(String username);
+    @Transactional(readOnly = true)
+    @Query("""
+    SELECT s.id from Seller s where s.username = :username
+""")
+
+    Optional<Long> findIdByUsername(String username);
 
     @Modifying
     @Transactional
