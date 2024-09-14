@@ -1,9 +1,11 @@
 package com.ayush.ayush.controller;
 
-import com.ayush.ayush.dto.AuthenticationRequest;
-import com.ayush.ayush.dto.AuthenticationResponse;
-import com.ayush.ayush.dto.SellerRegistrationRequest;
+import com.ayush.ayush.dto.*;
+import com.ayush.ayush.service.OtpService;
 import com.ayush.ayush.service.SellerAuthenticationService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class SellerAuthenticationController {
 
     private final SellerAuthenticationService authenticationService;
+    private final OtpService otpService;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerSeller(@RequestBody SellerRegistrationRequest request){
@@ -36,6 +39,24 @@ public class SellerAuthenticationController {
         return ResponseEntity.badRequest().body("User is already activated");
     }
 
+    @PostMapping("/generate-otp")
+    public ResponseEntity<ObjectNode> generateOtp(@RequestBody @Valid GenerateOtpRequest request){
+        String email = request.email();
+        String key = otpService.sendOtpSeller(email);
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode node = objectMapper.createObjectNode();
+        node.put("key", key);
+        return ResponseEntity.ok(node);
+    }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<String> verifyOtp(@Valid @RequestBody PasswordChangeRequest passwordChangeRequest){
+        boolean isValidOtp = otpService.verifyOtp(passwordChangeRequest.key(), passwordChangeRequest.otp());
+        if (isValidOtp){
+            authenticationService.changePassword(passwordChangeRequest.key(), passwordChangeRequest.newPassword());
+            return ResponseEntity.ok("Password Changed");
+        }
+        return ResponseEntity.badRequest().body("Invalid Otp");
+    }
 
 }

@@ -43,9 +43,7 @@ public abstract class AbstractEmailService implements EmailService {
     @Override
     @Transactional(propagation = NEVER)
     public void sendRegistrationMessage(String key,String receiverEmail){
-        if(receiverEmail==null || key==null || key.trim().length()==0){
-            throw new IllegalArgumentException("Arguments cannot be null or Blank!");
-        }
+        assertArguments(key, receiverEmail);
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
@@ -57,6 +55,24 @@ public abstract class AbstractEmailService implements EmailService {
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             throw new EmailServiceException("Error Sending Email", e);
+        }
+    }
+    public void sendOtpMessage(String otp,String receiverEmail){
+       assertArguments(otp,receiverEmail);
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+            helper.setTo(receiverEmail);
+            helper.setSubject("Otp For Changing Password");
+            helper.setText(otp);
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new EmailServiceException("Error Sending Email", e);
+        }
+    }
+    private void assertArguments(String arg, String email){
+        if(email==null || arg==null || arg.trim().length()==0){
+            throw new IllegalArgumentException("Arguments cannot be null or Blank!");
         }
     }
     abstract String getBasePath();

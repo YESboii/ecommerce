@@ -21,8 +21,12 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD:
     depends_on:
       - mysql
+      - redis
     ports:
       - "8080:8080"
     networks:
@@ -30,6 +34,13 @@ services:
     volumes:
       - "C:\\Users\\Ayush Gupta\\OneDrive\\Desktop\\Project\\ayush:/app"
       - "C:/Users/Ayush Gupta/.m2:/root/.m2"
+  redis:
+    image: redis
+    container_name: redis-store-container
+    networks:
+      - application-network
+    ports:
+      - "6379:6379"
 
 networks:
   application-network:

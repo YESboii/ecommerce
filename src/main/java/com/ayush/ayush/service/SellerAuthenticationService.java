@@ -119,6 +119,14 @@ public class SellerAuthenticationService implements AuthenticationService{
         }
         return false;
     }
+    public void changePassword(String key, String newPassword){
+        Long id = getIdFromKey(key);
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        sellerRepository.updatePassword(encodedNewPassword,id);
+    }
+    private Long getIdFromKey(String key){
+        return Long.parseLong(key.substring(5));
+    }
     private String generateRegistrationKey(){
         return UUID.randomUUID().toString();
     }
